@@ -1,6 +1,6 @@
 package com.eldie;
 
-import com.eldie.handler.HttpHandler;
+import com.eldie.handler.HttpServerHandler;
 import com.eldie.templates.ServerTemplate;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -38,7 +38,7 @@ public class HttpServer extends ServerTemplate {
 
                         cp.addLast("httpCodec", new HttpServerCodec());
                         cp.addLast("aggregator", new HttpObjectAggregator(1048576));
-                        cp.addLast(new HttpHandler());
+                        cp.addLast(new HttpServerHandler());
                     }
                 });
     }

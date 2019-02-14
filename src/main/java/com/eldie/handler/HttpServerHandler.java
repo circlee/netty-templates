@@ -10,7 +10,7 @@ import io.netty.util.internal.logging.InternalLogger;
 import static io.netty.util.internal.logging.InternalLoggerFactory.getInstance;
 
 
-public class HttpHandler extends ChannelInboundHandlerAdapter {
+public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
 
     InternalLogger logger = getInstance(getClass());

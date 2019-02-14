@@ -1,6 +1,6 @@
 package com.eldie;
 
-import com.eldie.handler.HttpHandler;
+import com.eldie.handler.EchoServerHandler;
 import com.eldie.templates.ServerTemplate;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -8,7 +8,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
@@ -34,8 +33,7 @@ public class EchoServer extends ServerTemplate {
                     @Override
                     protected void initChannel(SocketChannel sc) throws Exception {
                         ChannelPipeline cp = sc.pipeline();
-                        cp.addLast("httpCodec", new HttpServerCodec());
-                        cp.addLast(new HttpHandler());
+                        cp.addLast(new EchoServerHandler());
                     }
                 });
 
