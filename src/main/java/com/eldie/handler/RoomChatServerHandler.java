@@ -11,6 +11,7 @@ import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by circlee on 2019. 2. 15..
@@ -50,8 +51,15 @@ public class RoomChatServerHandler extends ChannelInboundHandlerAdapter {
             Channel channel = ctx.channel();
 
             if (message.startsWith("join->")) {
-                String joinRoom = message.replace("join->", "");
+                String joinPayload = message.replace("join->", "");
+
+                String[] payloads = joinPayload.split("/", 2);
+
+                String joinRoom = payloads[0];
+                String userName = (payloads.length == 2  ? payloads[1] : "RAN-"+ UUID.randomUUID());
+
                 channel.attr(AttributeKey.valueOf("ROOM")).set(joinRoom);
+                channel.attr(AttributeKey.valueOf("USERNAME")).set(userName);
 
                 ChannelGroup cg = this.roomChannels.computeIfAbsent(joinRoom, (key) -> {
                    return new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
@@ -62,7 +70,7 @@ public class RoomChatServerHandler extends ChannelInboundHandlerAdapter {
 
                 cg.stream().forEach(c -> {
                     if (c != channel) {
-                        c.writeAndFlush(Unpooled.wrappedBuffer("new memberJoined".getBytes()));
+                        c.writeAndFlush(Unpooled.wrappedBuffer(("new memberJoined : "+ userName).getBytes()));
                     } else {
                         c.writeAndFlush(Unpooled.wrappedBuffer(("successful joined to ROOM->" + joinRoom).getBytes()));
                     }
@@ -72,14 +80,18 @@ public class RoomChatServerHandler extends ChannelInboundHandlerAdapter {
             }
 
             String room = (String) channel.attr(AttributeKey.valueOf("ROOM")).get();
+            String userName = (String) channel.attr(AttributeKey.valueOf("USERNAME")).get();
             System.out.println(">>> ROOM[" + room + "] message>>> " + message);
+
+
+            String payloadMessage = "[user : "+userName+"]" + message;
             ChannelGroup cg = this.roomChannels.get(room);
 
             if (cg != null) {
                 cg.stream().forEach(c -> {
-                    System.out.println(c.hashCode());
+
                     if (c != channel) {
-                        c.writeAndFlush(Unpooled.wrappedBuffer(message.getBytes()));
+                        c.writeAndFlush(Unpooled.wrappedBuffer(payloadMessage.getBytes()));
                     }
                 });
             }

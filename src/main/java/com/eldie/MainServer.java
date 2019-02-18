@@ -25,6 +25,11 @@ public class MainServer {
             new HttpServer(8080).bootServer();
         });
 
+        excutor.execute(() -> {
+            // http server
+            new WebSocketServer(8081).bootServer();
+        });
+
 
 
     }
